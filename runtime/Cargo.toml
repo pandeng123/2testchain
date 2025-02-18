@@ -75,7 +75,7 @@ default = ["std"]
 std = [
 	"codec/std",
 	"scale-info/std",
-	
+
 	# Substrate FRAME
 	"frame-executive/std",
 	"frame-metadata-hash-extension/std",
@@ -141,6 +141,8 @@ runtime-benchmarks = [
 	"pallet-template/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
+	"pallet-evm/runtime-benchmarks",
 ]
 
 try-runtime = [
