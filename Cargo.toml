@@ -24,6 +24,11 @@ codec = { version = "3.6.12", default-features = false, package = "parity-scale-
 scale-info = { version = "2.11.6", default-features = false }
 tokio = "1.43.0"
 thiserror = "1.0"
+async-trait = "0.1"
+hex-literal = "0.4.1"
+log = { version = "0.4.21", default-features = false }
+rand = "0.8"
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 
 # Substrate Client
 sc-client-db = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false }

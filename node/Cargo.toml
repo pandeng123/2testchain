@@ -20,6 +20,13 @@ futures = { features = ["thread-pool"], workspace = true }
 serde_json = { workspace = true, default-features = true }
 jsonrpsee = { features = ["server"], workspace = true }
 
+async-trait = { workspace = true }
+hex-literal = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
 # primitives
 sp-core.workspace = true
 sp-core.default-features = true
