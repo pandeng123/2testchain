@@ -44,6 +44,9 @@ sp-blockchain.default-features = true
 sp-block-builder.workspace = true
 sp-block-builder.default-features = true
 
+sp-keystore = { workspace = true, features = ["default"] }
+sp-consensus-babe = { workspace = true, features = ["default"] }
+
 # client dependencies
 sc-cli.workspace = true
 sc-cli.default-features = true
@@ -71,6 +74,12 @@ sc-client-api.workspace = true
 sc-client-api.default-features = true
 sc-basic-authorship.workspace = true
 sc-basic-authorship.default-features = true
+
+sc-consensus-babe = { workspace = true }
+sc-consensus-babe-rpc = { workspace = true }
+sc-consensus-manual-seal = { workspace = true }
+sc-rpc = { workspace = true }
+sc-rpc-api = { workspace = true }
 
 # frame dependencies
 frame-system.workspace = true
