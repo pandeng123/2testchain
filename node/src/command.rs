@@ -7,7 +7,8 @@ use crate::{
 use frame_benchmarking_cli::{BenchmarkCmd, ExtrinsicFactory, SUBSTRATE_REFERENCE_HARDWARE};
 use sc_cli::SubstrateCli;
 use sc_service::PartialComponents;
-use solochain_template_runtime::{Block, EXISTENTIAL_DEPOSIT};
+use solochain_template_runtime::configs::ExistentialDeposit;
+use solochain_template_runtime::{Block};
 use sp_keyring::Sr25519Keyring;
 
 impl SubstrateCli for Cli {
@@ -159,7 +160,7 @@ pub fn run() -> sc_cli::Result<()> {
 							Box::new(TransferKeepAliveBuilder::new(
 								client.clone(),
 								Sr25519Keyring::Alice.to_account_id(),
-								EXISTENTIAL_DEPOSIT,
+								ExistentialDeposit::get(),
 							)),
 						]);
 

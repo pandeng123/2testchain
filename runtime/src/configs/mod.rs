@@ -52,6 +52,9 @@ use pallet_ethereum::{PostLogContent};
 // };
 use pallet_evm::{EnsureAddressTruncated, HashedAddressMapping};
 
+// Local imports
+mod constants;
+use constants::{currency::*, time::*};
 mod precompiles;
 use precompiles::FrontierPrecompiles;
 
@@ -59,7 +62,7 @@ use precompiles::FrontierPrecompiles;
 use super::{
 	AccountId, Aura, Balance, Balances, Block, BlockNumber, Hash, Nonce, PalletInfo, Runtime,
 	RuntimeCall, RuntimeEvent, RuntimeFreezeReason, RuntimeHoldReason, RuntimeOrigin, RuntimeTask,
-	System, EXISTENTIAL_DEPOSIT, SLOT_DURATION, VERSION, Timestamp,
+	System, VERSION, Timestamp,
 	EVMChainId, BaseFee,
 };
 
@@ -136,16 +139,25 @@ impl pallet_timestamp::Config for Runtime {
 	type WeightInfo = ();
 }
 
+// balances
+parameter_types! {
+    pub const ExistentialDeposit: Balance = 1000;
+    // For weight estimation, we assume that the most locks on an individual account will be 50.
+    // This number may need to be adjusted in the future if this assumption no longer holds true.
+    pub const MaxLocks: u32 = 50;
+    pub const MaxReserves: u32 = 50;
+}
+
 impl pallet_balances::Config for Runtime {
-	type MaxLocks = ConstU32<50>;
-	type MaxReserves = ();
+	type MaxLocks = MaxLocks;
+	type MaxReserves = MaxReserves;
 	type ReserveIdentifier = [u8; 8];
 	/// The type for recording an account's balance.
 	type Balance = Balance;
 	/// The ubiquitous event type.
 	type RuntimeEvent = RuntimeEvent;
 	type DustRemoval = ();
-	type ExistentialDeposit = ConstU128<EXISTENTIAL_DEPOSIT>;
+	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 	type FreezeIdentifier = RuntimeFreezeReason;

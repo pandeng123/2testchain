@@ -75,35 +75,35 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	state_version: 1,
 };
 
-mod block_times {
-	/// This determines the average expected block time that we are targeting. Blocks will be
-	/// produced at a minimum duration defined by `SLOT_DURATION`. `SLOT_DURATION` is picked up by
-	/// `pallet_timestamp` which is in turn picked up by `pallet_aura` to implement `fn
-	/// slot_duration()`.
-	///
-	/// Change this to adjust the block time.
-	pub const MILLI_SECS_PER_BLOCK: u64 = 6000;
+// mod block_times {
+// 	/// This determines the average expected block time that we are targeting. Blocks will be
+// 	/// produced at a minimum duration defined by `SLOT_DURATION`. `SLOT_DURATION` is picked up by
+// 	/// `pallet_timestamp` which is in turn picked up by `pallet_aura` to implement `fn
+// 	/// slot_duration()`.
+// 	///
+// 	/// Change this to adjust the block time.
+// 	pub const MILLI_SECS_PER_BLOCK: u64 = 6000;
 
-	// NOTE: Currently it is not possible to change the slot duration after the chain has started.
-	// Attempting to do so will brick block production.
-	pub const SLOT_DURATION: u64 = MILLI_SECS_PER_BLOCK;
-}
-pub use block_times::*;
+// 	// NOTE: Currently it is not possible to change the slot duration after the chain has started.
+// 	// Attempting to do so will brick block production.
+// 	pub const SLOT_DURATION: u64 = MILLI_SECS_PER_BLOCK;
+// }
+// pub use block_times::*;
 
-// Time is measured by number of blocks.
-pub const MINUTES: BlockNumber = 60_000 / (MILLI_SECS_PER_BLOCK as BlockNumber);
-pub const HOURS: BlockNumber = MINUTES * 60;
-pub const DAYS: BlockNumber = HOURS * 24;
+// // Time is measured by number of blocks.
+// pub const MINUTES: BlockNumber = 60_000 / (MILLI_SECS_PER_BLOCK as BlockNumber);
+// pub const HOURS: BlockNumber = MINUTES * 60;
+// pub const DAYS: BlockNumber = HOURS * 24;
 
-pub const BLOCK_HASH_COUNT: BlockNumber = 2400;
+// pub const BLOCK_HASH_COUNT: BlockNumber = 2400;
 
-// Unit = the base number of indivisible units for balances
-pub const UNIT: Balance = 1_000_000_000_000;
-pub const MILLI_UNIT: Balance = 1_000_000_000;
-pub const MICRO_UNIT: Balance = 1_000_000;
+// // Unit = the base number of indivisible units for balances
+// pub const UNIT: Balance = 1_000_000_000_000;
+// pub const MILLI_UNIT: Balance = 1_000_000_000;
+// pub const MICRO_UNIT: Balance = 1_000_000;
 
-/// Existential deposit.
-pub const EXISTENTIAL_DEPOSIT: Balance = MILLI_UNIT;
+// /// Existential deposit.
+// pub const EXISTENTIAL_DEPOSIT: Balance = MILLI_UNIT;
 
 /// The version information used to identify this runtime when compiled natively.
 #[cfg(feature = "std")]
