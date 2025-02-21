@@ -79,7 +79,6 @@ pallet-staking-runtime-api = { git = "https://github.com/paritytech/polkadot-sdk
 pallet-treasury = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false }
 pallet-utility = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false }
 pallet-fast-unstake = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false }
-
 # Substrate Utility
 substrate-prometheus-endpoint = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false}
 substrate-test-runtime-client = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2409", default-features = false }

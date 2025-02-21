@@ -55,7 +55,7 @@ use sp_version::RuntimeVersion;
 // Local module imports
 use super::{
 	AccountId, Aura, Balance, Block, Executive, Grandpa, InherentDataExt, Nonce, Runtime,
-	RuntimeCall, RuntimeGenesisConfig, SessionKeys, System, TransactionPayment, VERSION,
+	RuntimeCall, RuntimeGenesisConfig, opaque::SessionKeys, System, TransactionPayment, VERSION,
 	Ethereum, UncheckedExtrinsic, RuntimeOrigin
 };
 
@@ -308,7 +308,7 @@ impl_runtime_apis! {
 			TransactionPayment::length_to_fee(length)
 		}
 	}
-
+//------------------EVM-------------------//
 	impl fp_rpc::EthereumRuntimeRPCApi<Block> for Runtime {
 		fn chain_id() -> u64 {
 			<Runtime as pallet_evm::Config>::ChainId::get()
@@ -562,7 +562,7 @@ impl_runtime_apis! {
 			)
 		}
 	}
-
+//------------------EVM-------------------//
 	#[cfg(feature = "runtime-benchmarks")]
 	impl frame_benchmarking::Benchmark<Block> for Runtime {
 		fn benchmark_metadata(extra: bool) -> (

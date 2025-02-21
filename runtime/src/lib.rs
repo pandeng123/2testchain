@@ -1,5 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+// `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
+#![recursion_limit = "256"]
+#![allow(clippy::new_without_default, clippy::or_fun_call)]
+#![cfg_attr(feature = "runtime-benchmarks", deny(unused_crate_dependencies))]
+
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
@@ -47,14 +52,16 @@ pub mod opaque {
 	pub type BlockId = generic::BlockId<Block>;
 	/// Opaque block hash type.
 	pub type Hash = <BlakeTwo256 as HashT>::Output;
-}
 
-impl_opaque_keys! {
-	pub struct SessionKeys {
-		pub aura: Aura,
-		pub grandpa: Grandpa,
+	impl_opaque_keys! {
+		pub struct SessionKeys {
+			pub aura: Aura,
+			pub grandpa: Grandpa,
+		}
 	}
 }
+
+
 
 // To learn more about runtime versioning, see:
 // https://docs.substrate.io/main-docs/build/upgrade#runtime-versioning
@@ -144,6 +151,12 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 
 /// BlockId type as expected by this runtime.
 pub type BlockId = generic::BlockId<Block>;
+
+/// Type used for expressing timestamp.
+pub type Moment = u64;
+
+/// Index of a transaction in the chain.
+pub type Index = u32;
 
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
@@ -242,4 +255,66 @@ mod runtime {
 
 	#[runtime::pallet_index(12)]
 	pub type BaseFee = pallet_base_fee;
+
+	#[runtime::pallet_index(13)]
+	pub type Babe = pallet_babe;
+
+	#[runtime::pallet_index(14)]
+	pub type Treasury = pallet_treasury;
+
+	// Authorship must be before session in order to note author in the correct session and era
+	// for im-online and staking.
+	#[runtime::pallet_index(15)]
+	pub type Authorship = pallet_authorship;
+
+	#[runtime::pallet_index(16)]
+	pub type Utility = pallet_utility;
+
+	#[runtime::pallet_index(17)]
+	pub type Offences = pallet_offences;
+
+	#[runtime::pallet_index(18)]
+	pub type ImOnline = pallet_im_online;
+
+	#[runtime::pallet_index(19)]
+	pub type ElectionProviderMultiPhase = pallet_election_provider_multi_phase;
+
+	#[runtime::pallet_index(20)]
+	pub type Staking = pallet_staking;
+
+	#[runtime::pallet_index(21)]
+	pub type FastUnstake = pallet_fast_unstake;
+
+	#[runtime::pallet_index(22)]
+	pub type Session = pallet_session;
+
+	#[runtime::pallet_index(23)]
+	pub type Democracy = pallet_democracy;
+	
+	#[runtime::pallet_index(24)]
+	pub type Council = pallet_collective<Instance1>;
+
+	#[runtime::pallet_index(25)]
+	pub type TechnicalCommittee = pallet_collective<Instance2>;
+
+	#[runtime::pallet_index(26)]
+	pub type Elections = pallet_elections_phragmen;
+
+	#[runtime::pallet_index(27)]
+	pub type TechnicalMembership = pallet_membership<Instance1>;
+
+	#[runtime::pallet_index(28)]
+	pub type VoterList = pallet_bags_list<Instance1>;
+
+	#[runtime::pallet_index(29)]
+	pub type Historical = pallet_session::historical;
+
+	#[runtime::pallet_index(30)]
+	pub type Scheduler = pallet_scheduler;
+
+	#[runtime::pallet_index(31)]
+	pub type Preimage = pallet_preimage;
+
+	#[runtime::pallet_index(32)]
+	pub type NominationPools = pallet_nomination_pools;
 }
