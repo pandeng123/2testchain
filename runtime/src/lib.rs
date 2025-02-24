@@ -317,4 +317,11 @@ mod runtime {
 
 	#[runtime::pallet_index(32)]
 	pub type NominationPools = pallet_nomination_pools;
+
+	// Smart contracts
+	#[runtime::pallet_index(33)]
+	pub type RandomnessCollectiveFlip = pallet_insecure_randomness_collective_flip;
+
+	#[runtime::pallet_index(34)]
+	pub type Contracts = pallet_contracts;
 }
