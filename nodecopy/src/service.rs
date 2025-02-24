@@ -8,7 +8,7 @@ use sc_client_api::{Backend, BlockBackend};
 use sc_consensus::BasicQueue;
 use sc_consensus_babe::{BabeLink, BabeWorkerHandle, SlotProportion};
 use sc_executor::NativeExecutionDispatch;
-use sc_network_sync::strategy::warp::{WarpSyncParams, WarpSyncProvider};
+use sc_network_sync::strategy::warp::{WarpSyncConfig, WarpSyncProvider};
 use sc_service::{error::Error as ServiceError, Configuration, PartialComponents, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryHandle, TelemetryWorker};
 use sc_transaction_pool_api::OffchainTransactionPoolFactory;
@@ -17,7 +17,9 @@ use sp_core::U256;
 use sp_runtime::traits::Block as BlockT;
 use substrate_prometheus_endpoint::Registry;
 // Runtime
-use solochain_template_runtime::{opaque::Block, Hash, TransactionConverter};
+use solochain_template_runtime::{opaque::Block, Hash, apis::TransactionConverter};
+use solochain_template_runtime::apis::RuntimeApi;
+use solochain_template_runtime::configs::constants::time;
 
 use crate::{
     cli::Sealing,
@@ -297,8 +299,14 @@ where
     let FrontierPartialComponents { filter_pool, fee_history_cache, fee_history_cache_limit } =
         new_frontier_partial(&eth_config)?;
 
-    let mut net_config =
-        sc_network::config::FullNetworkConfiguration::<_, _, N>::new(&config.network);
+    let maybe_registry = config.prometheus_config.as_ref().map(|cfg| &cfg.registry);
+    let mut net_config = sc_network::config::FullNetworkConfiguration::<_, _, N>::new(
+        &config.network,
+        maybe_registry.cloned(),
+    );
+
+    // let mut net_config =
+    //     sc_network::config::FullNetworkConfiguration::<_, _, N>::new(&config.network);
     let peer_store_handle = net_config.peer_store_handle();
     let metrics = N::register_notification_metrics(
         config.prometheus_config.as_ref().map(|cfg| &cfg.registry),
@@ -316,7 +324,7 @@ where
             peer_store_handle,
         );
 
-    let warp_sync_params = if sealing.is_some() {
+    let warp_sync_config = if sealing.is_some() {
         None
     } else {
         net_config.add_notification_protocol(grandpa_protocol_config);
@@ -326,7 +334,7 @@ where
                 grandpa_link.shared_authority_set().clone(),
                 Vec::default(),
             ));
-        Some(WarpSyncParams::WithProvider(warp_sync))
+        Some(WarpSyncConfig::WithProvider(warp_sync))
     };
 
     let (network, system_rpc_tx, tx_handler_controller, network_starter, sync_service) =
@@ -338,7 +346,7 @@ where
             spawn_handle: task_manager.spawn_handle(),
             import_queue,
             block_announce_validator_builder: None,
-            warp_sync_params,
+            warp_sync_config,
             block_relay: None,
             metrics,
         })?;
@@ -386,7 +394,7 @@ where
     let pubsub_notification_sinks = Arc::new(pubsub_notification_sinks);
 
     // for ethereum-compatibility rpc.
-    config.rpc_id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));
+    config.rpc.id_provider = Some(Box::new(fc_rpc::EthereumSubIdProvider));
 
     let pending_create_inherent_data_providers = move |_, ()| async move {
         let current = sp_timestamp::InherentDataProvider::from_system_time();
@@ -405,7 +413,7 @@ where
         client: client.clone(),
         pool: transaction_pool.clone(),
         graph: transaction_pool.pool().clone(),
-        converter: Some(TransactionConverter),
+        converter: Some(TransactionConverter::<Block>::default()),
         is_authority: config.role.is_authority(),
         enable_dev_signer: eth_config.enable_dev_signer,
         network: network.clone(),
@@ -445,13 +453,12 @@ where
             Some(shared_authority_set.clone()),
         );
 
-        Box::new(move |deny_unsafe, subscription_executor: sc_rpc::SubscriptionTaskExecutor| {
+        Box::new(move |subscription_executor: sc_rpc::SubscriptionTaskExecutor| {
             let shared_voter_state = sc_consensus_grandpa::SharedVoterState::empty();
             let deps = crate::rpc::FullDeps {
                 client: client.clone(),
                 pool: pool.clone(),
                 select_chain: select_chain.clone(),
-                deny_unsafe,
                 command_sink: if sealing.is_some() { Some(command_sink.clone()) } else { None },
                 eth: eth_rpc_params.clone(),
                 babe: crate::rpc::BabeDeps {
@@ -664,7 +671,7 @@ where
             inherent_data: &mut sp_inherents::InherentData,
         ) -> Result<(), sp_inherents::Error> {
             TIMESTAMP.with(|x| {
-                *x.borrow_mut() += solochain_template_runtime::constants::time::SLOT_DURATION;
+                *x.borrow_mut() += solochain_template_runtime::configs::constants::time::SLOT_DURATION;
                 inherent_data.put_data(sp_timestamp::INHERENT_IDENTIFIER, &*x.borrow())
             })
         }
@@ -724,7 +731,7 @@ pub async fn build_full(
     eth_config: EthConfiguration,
     sealing: Option<Sealing>,
 ) -> Result<TaskManager, ServiceError> {
-    new_full::<solochain_template_runtime::RuntimeApi, BolarityRuntimeExecutor, sc_network::NetworkWorker<_, _>>(
+    new_full::<solochain_template_runtime::apis::RuntimeApi, BolarityRuntimeExecutor, sc_network::NetworkWorker<_, _>>(
         config, eth_config, sealing,
     )
     .await
@@ -739,7 +746,7 @@ pub fn new_chain_ops(
 > {
     config.keystore = sc_service::config::KeystoreConfig::InMemory;
     let PartialComponents { client, backend, import_queue, task_manager, other, .. } =
-        new_partial::<solochain_template_runtime::RuntimeApi, BolarityRuntimeExecutor, _>(
+        new_partial::<solochain_template_runtime::apis::RuntimeApi, BolarityRuntimeExecutor, _>(
             config,
             eth_config,
             build_babe_grandpa_import_queue,

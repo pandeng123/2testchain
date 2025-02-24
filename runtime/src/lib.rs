@@ -53,12 +53,13 @@ pub mod opaque {
 	/// Opaque block hash type.
 	pub type Hash = <BlakeTwo256 as HashT>::Output;
 
-	impl_opaque_keys! {
-		pub struct SessionKeys {
-			pub aura: Aura,
-			pub grandpa: Grandpa,
-		}
-	}
+    impl_opaque_keys! {
+        pub struct SessionKeys {
+            pub babe: Babe,
+            pub grandpa: Grandpa,
+            pub im_online: ImOnline,
+        }
+    }
 }
 
 
@@ -117,6 +118,9 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 pub fn native_version() -> NativeVersion {
 	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
+
+#[cfg(any(feature = "std", test))]
+pub use pallet_staking::StakerStatus;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = MultiSignature;

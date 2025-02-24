@@ -9,7 +9,7 @@ use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
 #[allow(unused_imports)]
 use sp_core::ecdsa;
-use sp_core::{Pair, Public, H160, U256};
+use sp_core::{Pair, Public, H160, U256, sr25519};
 use sp_runtime::{
     traits::{IdentifyAccount, Verify},
     Perbill,
@@ -17,26 +17,32 @@ use sp_runtime::{
 
 // Frontier
 use solochain_template_runtime::{
-    constants::currency::*, opaque::SessionKeys, AccountId, Balance, MaxNominations,
-    RuntimeGenesisConfig, SS58Prefix, Signature, StakerStatus, BABE_GENESIS_EPOCH_CONFIG,
+    configs::constants::currency::*,
+    apis::BABE_GENESIS_EPOCH_CONFIG,
+    opaque::SessionKeys, AccountId, Balance, 
+    configs::{MaxNominations, SS58Prefix},
+    RuntimeGenesisConfig, Signature, StakerStatus,
     WASM_BINARY,
 };
+
+// use solochain_template_runtime::{
+//     constants::currency::*, opaque::SessionKeys, AccountId, Balance, MaxNominations,
+//     RuntimeGenesisConfig, SS58Prefix, Signature, StakerStatus, BABE_GENESIS_EPOCH_CONFIG,
+//     WASM_BINARY,
+// };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 
 // The URL for the telemetry server.
 // const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 /// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
-pub type ChainSpec = sc_service::GenericChainSpec<RuntimeGenesisConfig>;
+pub type ChainSpec = sc_service::GenericChainSpec;
 
 // Public account type
-#[allow(dead_code)]
 type AccountPublic = <Signature as Verify>::Signer;
 
 // Dev chain config
 pub fn development_config() -> ChainSpec {
-    use devnet_keys::*;
-
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
         .with_name("Development")
         .with_id("dev")
@@ -44,11 +50,16 @@ pub fn development_config() -> ChainSpec {
         .with_properties(properties())
         .with_genesis_config_patch(testnet_genesis(
             // Sudo account (Alith)
-            alith(),
+            get_account_id_from_seed::<sr25519::Public>("Alice"),
             // Pre-funded accounts
-            vec![alith(), baltathar(), charleth(), dorothy(), ethan(), faith(), goliath()],
+            vec![
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                get_account_id_from_seed::<sr25519::Public>("Bob"),
+                get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+            ],
             // Initial Validators and PoA authorities
-            vec![alice_session_keys()],
+            vec![authority_keys_from_seed("Alice")],
             // Initial nominators
             vec![],
             // Ethereum chain ID
@@ -59,8 +70,6 @@ pub fn development_config() -> ChainSpec {
 
 // Local testnet config
 pub fn local_testnet_config() -> ChainSpec {
-    use devnet_keys::*;
-
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
         .with_name("Local Testnet")
         .with_id("local")
@@ -69,10 +78,23 @@ pub fn local_testnet_config() -> ChainSpec {
         .with_genesis_config_patch(testnet_genesis(
             // Initial PoA authorities
             // Sudo account (Alith)
-            alith(),
+            get_account_id_from_seed::<sr25519::Public>("Alice"),
             // Pre-funded accounts
-            vec![alith(), baltathar(), charleth(), dorothy(), ethan(), faith(), goliath()],
-            vec![alice_session_keys(), bob_session_keys()],
+            vec![
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                get_account_id_from_seed::<sr25519::Public>("Bob"),
+                get_account_id_from_seed::<sr25519::Public>("Charlie"),
+                get_account_id_from_seed::<sr25519::Public>("Dave"),
+                get_account_id_from_seed::<sr25519::Public>("Eve"),
+                get_account_id_from_seed::<sr25519::Public>("Ferdie"),
+                get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+            ],
+            vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
             vec![],
             // Ethereum chain ID
             SS58Prefix::get() as u64,
@@ -82,31 +104,34 @@ pub fn local_testnet_config() -> ChainSpec {
 
 // Testnet config
 pub fn testnet_config() -> ChainSpec {
-    use testnet_keys::*;
-
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
         .with_name("Bolarity Testnet")
         .with_id("testnet")
         .with_chain_type(ChainType::Custom("Testnet".to_string()))
         .with_properties(properties())
         .with_genesis_config_patch(testnet_genesis(
-            // Initial PoA authorities
-            // Sudo account (Alith)
-            lionel(),
+            // Sudo account
+            get_account_id_from_seed::<sr25519::Public>("Alice"),
             // Pre-funded accounts
             vec![
-                lionel(),
-                diego(),
-                pele(),
-                franz(),
-                johan(),
-                ronaldo(),
-                zinedine(),
-                cristiano(),
-                michel(),
-                roberto(),
+                get_account_id_from_seed::<sr25519::Public>("Alice"),
+                get_account_id_from_seed::<sr25519::Public>("Bob"),
+                get_account_id_from_seed::<sr25519::Public>("Charlie"),
+                get_account_id_from_seed::<sr25519::Public>("Dave"),
+                get_account_id_from_seed::<sr25519::Public>("Eve"),
+                get_account_id_from_seed::<sr25519::Public>("Ferdie"),
+                get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
+                get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
             ],
-            vec![diego_session_keys(), pele_session_keys(), franz_session_keys()],
+            vec![
+                authority_keys_from_seed("Alice"), 
+                authority_keys_from_seed("Bob"),
+                authority_keys_from_seed("Charlie")
+            ],
             vec![],
             // Ethereum chain ID
             SS58Prefix::get() as u64,
@@ -129,7 +154,7 @@ fn testnet_genesis(
         .chain(initial_nominators.iter())
         .for_each(|x| {
             if !endowed_accounts.contains(x) {
-                endowed_accounts.push(*x)
+                endowed_accounts.push(x.clone())
             }
         });
 
@@ -141,7 +166,7 @@ fn testnet_genesis(
     let mut rng = rand::thread_rng();
     let stakers = initial_authorities
         .iter()
-        .map(|x| (x.0, x.1, STASH, StakerStatus::Validator))
+        .map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
         .chain(initial_nominators.iter().map(|x| {
             use rand::{seq::SliceRandom, Rng};
             let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
@@ -149,9 +174,9 @@ fn testnet_genesis(
             let nominations = initial_authorities
                 .as_slice()
                 .choose_multiple(&mut rng, count)
-                .map(|choice| choice.0)
+                .map(|choice| choice.0.clone())
                 .collect::<Vec<_>>();
-            (*x, *x, STASH, StakerStatus::Nominator(nominations))
+            (x.clone(), x.clone(), STASH, StakerStatus::Nominator(nominations))
         }))
         .collect::<Vec<_>>();
     let evm_accounts = {
@@ -211,13 +236,13 @@ fn testnet_genesis(
         "session": {
             "keys": initial_authorities
                 .iter()
-                .map(|x| (x.1, x.0, session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
+                .map(|x| (x.1.clone(), x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
                 .collect::<Vec<_>>(),
         },
         "staking": {
             "validatorCount": initial_authorities.len() as u32,
             "minimumValidatorCount": initial_authorities.len() as u32,
-            "invulnerables": initial_authorities.iter().map(|x| x.0).collect::<Vec<_>>(),
+            "invulnerables": initial_authorities.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
             "slashRewardFraction": Perbill::from_percent(10),
             "stakers": stakers.clone(),
             "minValidatorBond": 75_000 * DOLLARS,
@@ -249,175 +274,17 @@ fn testnet_genesis(
     })
 }
 
-mod devnet_keys {
-    use super::*;
-
-    pub(super) fn alith() -> AccountId {
-        AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac"))
-    }
-
-    pub(super) fn baltathar() -> AccountId {
-        AccountId::from(hex!("3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0"))
-    }
-
-    pub(super) fn charleth() -> AccountId {
-        AccountId::from(hex!("798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc"))
-    }
-
-    pub(super) fn dorothy() -> AccountId {
-        AccountId::from(hex!("773539d4Ac0e786233D90A233654ccEE26a613D9"))
-    }
-
-    pub(super) fn ethan() -> AccountId {
-        AccountId::from(hex!("Ff64d3F6efE2317EE2807d223a0Bdc4c0c49dfDB"))
-    }
-
-    pub(super) fn faith() -> AccountId {
-        AccountId::from(hex!("C0F0f4ab324C46e55D02D0033343B4Be8A55532d"))
-    }
-
-    pub(super) fn goliath() -> AccountId {
-        AccountId::from(hex!("7BF369283338E12C90514468aa3868A551AB2929"))
-    }
-
-    pub(super) fn alice_session_keys() -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-        (
-            AccountId::from(hex!("487d29457e604aa45c35778Af0d76fCCaC195822")), // stash
-            AccountId::from(hex!("8097c3C354652CB1EEed3E5B65fBa2576470678A")), // controller
-            sp_core::sr25519::Public::from_raw(hex!(
-                "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            ))
-            .into(),
-            sp_core::ed25519::Public::from_raw(hex!(
-                "88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee"
-            ))
-            .into(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
-            ))
-            .into(),
-        )
-    }
-
-    pub(super) fn bob_session_keys() -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-        (
-            AccountId::from(hex!("9D370e560F42d1041eE835169df9A921A6e2589A")), // stash
-            AccountId::from(hex!("9Ab9804Ff30EB824b5410FC14231C1cA47A879E8")), // controller
-            sp_core::sr25519::Public::from_raw(hex!(
-                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
-            ))
-            .into(),
-            sp_core::ed25519::Public::from_raw(hex!(
-                "d17c2d7823ebf260fd138f2d7e27d114c0145d968b5ff5006125f2414fadae69"
-            ))
-            .into(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48"
-            ))
-            .into(),
-        )
-    }
-}
-
-mod testnet_keys {
-    use super::*;
-
-    pub(super) fn lionel() -> AccountId {
-        AccountId::from(hex!("1A5E1E46079b69f8c3bB853253005595776B292a"))
-    }
-
-    pub(super) fn diego() -> AccountId {
-        AccountId::from(hex!("ecE34A4eAb98014B6118Af57737cF20e8C7B6cB7"))
-    }
-
-    pub(super) fn pele() -> AccountId {
-        AccountId::from(hex!("a70bc22F1b546A070769002E9cd909e15b09A47A"))
-    }
-
-    pub(super) fn franz() -> AccountId {
-        AccountId::from(hex!("57D650279B0EC63277430868bcA32B31eCf323Dc"))
-    }
-
-    pub(super) fn johan() -> AccountId {
-        AccountId::from(hex!("795dF05777CCD03e0B568a4C5aed366e231D0c8E"))
-    }
-
-    pub(super) fn ronaldo() -> AccountId {
-        AccountId::from(hex!("1a36b1ef5AA7439e11CF6A07581ABE473A59B572"))
-    }
-
-    pub(super) fn zinedine() -> AccountId {
-        AccountId::from(hex!("2c0c3C3A85B0F5cf59b5c290033bAe866e5228c4"))
-    }
-
-    pub(super) fn cristiano() -> AccountId {
-        AccountId::from(hex!("ae3043bCF47658F266258415363D745FAE009Fb4"))
-    }
-
-    pub(super) fn michel() -> AccountId {
-        AccountId::from(hex!("C36821F9F66893c683349007B0d82f03948BebC6"))
-    }
-
-    pub(super) fn roberto() -> AccountId {
-        AccountId::from(hex!("368f9d1D4f3b1EF461dD68F0458D57B32DF4e639"))
-    }
-
-    pub(super) fn diego_session_keys() -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-        (
-            AccountId::from(hex!("60dD15D650881EFbDDc7687E53Cca8C59918F7dE")), // stash
-            diego(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "46c4b1db570721a9a63b15d64a18079a22a07359904197d3dc495cadf6f4f819"
-            ))
-            .into(),
-            sp_core::ed25519::Public::from_raw(hex!(
-                "184421c2c8895ca3e2c153bfe05197235addfa1f29c885f00d517c00ae6a97cd"
-            ))
-            .into(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "46c4b1db570721a9a63b15d64a18079a22a07359904197d3dc495cadf6f4f819"
-            ))
-            .into(),
-        )
-    }
-
-    pub(super) fn pele_session_keys() -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-        (
-            AccountId::from(hex!("a5af63F5c55f107100968F7061466148FBdFFB73")), // stash
-            pele(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "f21ebebfb3dc7410f49616e33e30e0f3cecd77229e6948c1a37298dc9f69bd74"
-            ))
-            .into(),
-            sp_core::ed25519::Public::from_raw(hex!(
-                "3fd3328b86cdd20c83741e43840dd2255b7b4533d29939695a02f5cbbbae89a4"
-            ))
-            .into(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "f21ebebfb3dc7410f49616e33e30e0f3cecd77229e6948c1a37298dc9f69bd74"
-            ))
-            .into(),
-        )
-    }
-
-    pub(super) fn franz_session_keys() -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-        (
-            AccountId::from(hex!("2Ad92a54f35c1f1C557ED818dA4F3BF25c9A1C32")), // stash
-            franz(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "08c6047923ddfbafa2f6a42b20132456f6e9afb01552441b0fc13e35f799dc1a"
-            ))
-            .into(),
-            sp_core::ed25519::Public::from_raw(hex!(
-                "6064c973e8353e0064b00e9b21c7aedabc2b410792d020cbd1483b0ef48c9f06"
-            ))
-            .into(),
-            sp_core::sr25519::Public::from_raw(hex!(
-                "08c6047923ddfbafa2f6a42b20132456f6e9afb01552441b0fc13e35f799dc1a"
-            ))
-            .into(),
-        )
-    }
+/// Helper function to generate stash, controller and session key from seed
+pub fn authority_keys_from_seed(
+	seed: &str,
+) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
+	(
+		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
+		get_account_id_from_seed::<sr25519::Public>(seed),
+		get_from_seed::<BabeId>(seed),
+        get_from_seed::<GrandpaId>(seed),
+		get_from_seed::<ImOnlineId>(seed),
+	)
 }
 
 fn session_keys(babe: BabeId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
@@ -432,25 +299,12 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 }
 
 /// Generate an account ID from seed.
-/// For use with `AccountId32`, `dead_code` if `AccountId20`.
-#[allow(dead_code)]
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
 where
     AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
     AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
-
-/// Generate authority keys
-// pub fn authority_keys_from_seed(s: &str) -> (AccountId, AccountId, BabeId, GrandpaId, ImOnlineId) {
-//     (
-//         AccountId::from(hex!("487d29457e604aa45c35778Af0d76fCCaC195822")),   // Alice//stash
-//         AccountId::from(hex!("8097c3C354652CB1EEed3E5B65fBa2576470678A")),   // Alice
-//         get_from_seed::<BabeId>(s),
-//         get_from_seed::<GrandpaId>(s),
-//         get_from_seed::<ImOnlineId>(s),
-//     )
-// }
 
 // Chain properties
 fn properties() -> Properties {

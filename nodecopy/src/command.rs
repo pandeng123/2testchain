@@ -38,7 +38,7 @@ impl SubstrateCli for Cli {
     fn copyright_start_year() -> i32 {
         2024
     }
-
+    
     fn load_spec(&self, id: &str) -> Result<Box<dyn ChainSpec>, String> {
         Ok(match id {
             "dev" => Box::new(chain_spec::development_config()),

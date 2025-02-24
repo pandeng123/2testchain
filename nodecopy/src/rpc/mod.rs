@@ -61,8 +61,6 @@ pub struct FullDeps<C, P, BE, A: ChainApi, CT, SC, CIDP> {
     pub pool: Arc<P>,
     /// The SelectChain Strategy
     pub select_chain: SC,
-    /// Whether to deny unsafe calls
-    pub deny_unsafe: DenyUnsafe,
     /// Manual seal command sink
     pub command_sink: Option<mpsc::Sender<EngineCommand<Hash>>>,
     /// Ethereum-compatibility specific dependencies.
@@ -119,7 +117,7 @@ where
     use substrate_frame_rpc_system::{System, SystemApiServer};
 
     let mut io = RpcModule::new(());
-    let FullDeps { client, pool, select_chain, deny_unsafe, command_sink, eth, babe, grandpa } =
+    let FullDeps { client, pool, select_chain, command_sink, eth, babe, grandpa } =
         deps;
     let BabeDeps { keystore, worker_handle } = babe;
     let GrandpaDeps {
@@ -130,9 +128,9 @@ where
         finality_provider,
     } = grandpa;
 
-    io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
+    io.merge(System::new(client.clone(), pool).into_rpc())?;
     io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
-    io.merge(Babe::new(client, worker_handle, keystore, select_chain, deny_unsafe).into_rpc())?;
+    io.merge(Babe::new(client, worker_handle.clone(), keystore, select_chain).into_rpc())?;
     io.merge(
         Grandpa::new(
             subscription_executor,

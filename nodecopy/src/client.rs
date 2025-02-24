@@ -12,7 +12,7 @@ pub type FullBackend = sc_service::TFullBackend<Block>;
 pub type FullClient<RuntimeApi, Executor> =
     sc_service::TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>;
 
-pub type Client = FullClient<solochain_template_runtime::RuntimeApi, BolarityRuntimeExecutor>;
+pub type Client = FullClient<solochain_template_runtime::apis::RuntimeApi, BolarityRuntimeExecutor>;
 
 /// Only enable the benchmarking host functions when we actually want to benchmark.
 #[cfg(feature = "runtime-benchmarks")]
@@ -26,7 +26,7 @@ impl NativeExecutionDispatch for BolarityRuntimeExecutor {
     type ExtendHostFunctions = HostFunctions;
 
     fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
-        solochain_template_runtime::api::dispatch(method, data)
+        solochain_template_runtime::apis::api::dispatch(method, data)
     }
 
     fn native_version() -> NativeVersion {

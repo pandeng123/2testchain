@@ -18,7 +18,7 @@ hex-literal = { workspace = true }
 jsonrpsee = { workspace = true, features = ["server", "macros"] }
 log = { workspace = true }
 rand = { workspace = true }
-parity-scale-codec = { workspace = true }
+codec = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
@@ -94,7 +94,7 @@ solochain-template-runtime = { workspace = true, features = ["std"] }
 substrate-build-script-utils = { workspace = true }
 
 [features]
-default = ["with-rocksdb-weights", "rocksdb", "sql", "txpool"]
+default = ["rocksdb", "sql", "txpool"]
 rocksdb = [
     "sc-cli/rocksdb",
     "sc-service/rocksdb",
@@ -104,8 +104,6 @@ rocksdb = [
     "fc-rpc/rocksdb",
 ]
 sql = ["fc-db/sql", "fc-mapping-sync/sql"]
-with-rocksdb-weights = ["solochain-template-runtime/with-rocksdb-weights"]
-with-paritydb-weights = ["solochain-template-runtime/with-paritydb-weights"]
 txpool = ["fc-rpc/txpool"]
 rpc-binary-search-estimate = ["fc-rpc/rpc-binary-search-estimate"]
 runtime-benchmarks = [
