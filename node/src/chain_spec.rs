@@ -102,7 +102,7 @@ pub fn local_testnet_config() -> ChainSpec {
 // Testnet config
 pub fn testnet_config() -> ChainSpec {
     ChainSpec::builder(WASM_BINARY.expect("WASM not available"), Default::default())
-        .with_name("Bolarity Testnet")
+        .with_name("HaHaXiao Testnet")
         .with_id("testnet")
         .with_chain_type(ChainType::Custom("Testnet".to_string()))
         .with_properties(properties())
