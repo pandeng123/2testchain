@@ -212,7 +212,7 @@ where
     })
 }
 
-/// Build the import queue for the template runtime (aura + grandpa).
+/// Build the import queue for the template runtime (babe + grandpa).
 pub fn build_babe_grandpa_import_queue<RuntimeApi, HostFunctions>(
     client: Arc<FullClient<Block, RuntimeApi, HostFunctions>>,
     config: &Configuration,
@@ -678,7 +678,7 @@ where
     thread_local!(static TIMESTAMP: RefCell<u64> = const { RefCell::new(0) });
 
     /// Provide a mock duration starting at 0 in millisecond for timestamp inherent.
-    /// Each call will increment timestamp by slot_duration making Aura think time has passed.
+    /// Each call will increment timestamp by slot_duration making Babe think time has passed.
     struct MockTimestampInherentDataProvider;
 
     #[async_trait::async_trait]

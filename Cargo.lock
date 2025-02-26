@@ -5766,22 +5766,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-aura"
-version = "37.0.0"
-source = "git+https://github.com/paritytech/polkadot-sdk?branch=stable2409#ac431bce9d42edd0b04530f7dada02c37c0aa1de"
-dependencies = [
- "frame-support",
- "frame-system",
- "log",
- "pallet-timestamp",
- "parity-scale-codec",
- "scale-info",
- "sp-application-crypto",
- "sp-consensus-aura",
- "sp-runtime",
-]
-
-[[package]]
 name = "pallet-authorship"
 version = "38.0.0"
 source = "git+https://github.com/paritytech/polkadot-sdk?branch=stable2409#ac431bce9d42edd0b04530f7dada02c37c0aa1de"
@@ -9634,7 +9618,6 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
  "log",
- "pallet-aura",
  "pallet-authorship",
  "pallet-babe",
  "pallet-bags-list",
@@ -9679,7 +9662,6 @@ dependencies = [
  "scale-info",
  "sp-api",
  "sp-block-builder",
- "sp-consensus-aura",
  "sp-consensus-babe",
  "sp-consensus-grandpa",
  "sp-core",
