@@ -304,9 +304,12 @@ where
 }
 
 // Chain properties
+//1MHAO = 100 0000 HAO
+//100MHAO = 100 * 100 0000 = 1亿HAO
+//1HAO = 10^18次方
 fn properties() -> Properties {
     let mut properties = Properties::new();
-    properties.insert("tokenSymbol".into(), "BOL".into());
+    properties.insert("tokenSymbol".into(), "HAO".into());
     properties.insert("tokenDecimals".into(), 18.into());
     properties.insert("ss58Format".into(), SS58Prefix::get().into());
     properties
