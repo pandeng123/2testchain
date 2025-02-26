@@ -8,7 +8,7 @@ use std::{
 use futures::{future, prelude::*};
 // Substrate
 use sc_client_api::BlockchainEvents;
-use sc_executor::NativeExecutionDispatch;
+use sc_executor::HostFunctions;
 use sc_network_sync::SyncingService;
 use sc_service::{error::Error as ServiceError, Configuration, TaskManager};
 use sp_api::ConstructRuntimeApi;
@@ -123,11 +123,11 @@ impl<Api> EthCompatRuntimeApiCollection for Api where
 {
 }
 
-pub async fn spawn_frontier_tasks<RuntimeApi, Executor>(
+pub async fn spawn_frontier_tasks<RuntimeApi, HT>(
     task_manager: &TaskManager,
-    client: Arc<FullClient<RuntimeApi, Executor>>,
-    backend: Arc<FullBackend>,
-    frontier_backend: Arc<FrontierBackend<FullClient<RuntimeApi, Executor>>>,
+    client: Arc<FullClient<Block, RuntimeApi, HT>>,
+    backend: Arc<FullBackend<Block>>,
+    frontier_backend: Arc<FrontierBackend<FullClient<Block, RuntimeApi, HT>>>,
     filter_pool: Option<FilterPool>,
     storage_override: Arc<dyn StorageOverride<Block>>,
     fee_history_cache: FeeHistoryCache,
@@ -139,10 +139,10 @@ pub async fn spawn_frontier_tasks<RuntimeApi, Executor>(
         >,
     >,
 ) where
-    RuntimeApi: ConstructRuntimeApi<Block, FullClient<RuntimeApi, Executor>>,
+    RuntimeApi: ConstructRuntimeApi<Block, FullClient<Block, RuntimeApi, HT>>,
     RuntimeApi: Send + Sync + 'static,
     RuntimeApi::RuntimeApi: EthCompatRuntimeApiCollection,
-    Executor: NativeExecutionDispatch + 'static,
+    HT: HostFunctions + 'static,
 {
     // Spawn main mapping sync worker background task.
     match &*frontier_backend {

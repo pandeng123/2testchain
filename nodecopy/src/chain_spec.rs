@@ -1,8 +1,5 @@
 use std::{collections::BTreeMap, str::FromStr};
 
-// 3rd party imports
-use hex_literal::hex;
-
 // Substrate
 use sc_chain_spec::{ChainType, Properties};
 use sp_consensus_babe::AuthorityId as BabeId;
@@ -21,7 +18,7 @@ use solochain_template_runtime::{
     apis::BABE_GENESIS_EPOCH_CONFIG,
     opaque::SessionKeys, AccountId, Balance, 
     configs::{MaxNominations, SS58Prefix},
-    RuntimeGenesisConfig, Signature, StakerStatus,
+    Signature, StakerStatus,
     WASM_BINARY,
 };
 

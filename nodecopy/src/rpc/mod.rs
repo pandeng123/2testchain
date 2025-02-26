@@ -16,7 +16,6 @@ use sc_consensus_grandpa::{
 };
 use sc_consensus_manual_seal::rpc::EngineCommand;
 use sc_rpc::SubscriptionTaskExecutor;
-use sc_rpc_api::DenyUnsafe;
 use sc_service::TransactionPool;
 use sc_transaction_pool::ChainApi;
 use sp_api::{CallApiAt, ProvideRuntimeApi};
